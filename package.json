@@ -1,0 +1,84 @@
+{
+  "name": "@w3lnet/wallet-auth",
+  "private": false,
+  "version": "0.1.0",
+  "description": "TRON + EVM WalletConnect authentication helpers for browser and server apps.",
+  "type": "module",
+  "license": "MIT",
+  "author": "w3lnet",
+  "keywords": [
+    "walletconnect",
+    "tron",
+    "evm",
+    "authentication",
+    "web3",
+    "caip10",
+    "multi-chain"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.js"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js"
+    },
+    "./express": {
+      "types": "./dist/express.d.ts",
+      "import": "./dist/express.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@walletconnect/sign-client": "^2.17.2",
+    "nanoid": "^5.0.7",
+    "tronweb": "^5.3.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@walletconnect/modal": "^2.7.0",
+    "express": "^4.19.2",
+    "react": "^18.3.1",
+    "typescript": "^5.5.4",
+    "vitest": "^2.1.9"
+  },
+  "peerDependencies": {
+    "@walletconnect/modal": ">=2",
+    "@walletconnect/sign-client": ">=2",
+    "express": ">=4",
+    "tronweb": ">=5",
+    "zod": ">=3"
+  },
+  "peerDependenciesMeta": {
+    "@walletconnect/modal": {
+      "optional": true
+    },
+    "express": {
+      "optional": true
+    }
+  },
+  "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319"
+}
