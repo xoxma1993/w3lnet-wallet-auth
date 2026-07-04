@@ -34,18 +34,22 @@ export function createWalletAuthRouter(options) {
             const body = authVerifySchema.parse(request.body);
             const nonceOk = await options.nonceStore.consume(body.nonce, body.message);
             if (!nonceOk) {
+                await emitSecurityEvent(options, request, { type: "invalid_nonce", detail: "Nonce validation failed" });
                 throw new WalletAuthError("INVALID_NONCE", "Nonce is invalid, expired, already used, or message was changed", 400);
             }
             if (body.namespace !== "tron") {
+                await emitSecurityEvent(options, request, { type: "invalid_signature", detail: `Unsupported login namespace: ${body.namespace}` });
                 throw new WalletAuthError("INVALID_SIGNATURE", "Only TRON login signatures are supported by this router", 400);
             }
             if (!verifyTronMessage({ message: body.message, signature: body.signature, expectedAddress: body.account })) {
+                await emitSecurityEvent(options, request, { type: "invalid_signature", detail: "TRON signature mismatch" });
                 throw new WalletAuthError("INVALID_SIGNATURE", "TRON signature does not match account", 401);
             }
             try {
                 validateApprovedNamespaces({ request: body, proposal });
             }
             catch (error) {
+                await emitSecurityEvent(options, request, { type: "invalid_namespaces", detail: error instanceof Error ? error.message : "Approved namespaces are invalid" });
                 throw new WalletAuthError("INVALID_NAMESPACES", error instanceof Error ? error.message : "Approved namespaces are invalid", 400);
             }
             const issuedAt = new Date();
@@ -62,6 +66,12 @@ export function createWalletAuthRouter(options) {
             next(error);
         }
     });
+    if (options.honeypot) {
+        router.all("/*", async (request, response) => {
+            await emitSecurityEvent(options, request, { type: "honeypot", detail: "Unknown wallet-auth route requested" });
+            response.status(404).json({ error: "Not found" });
+        });
+    }
     return router;
 }
 export function createApprovedSession(input) {
@@ -76,6 +86,15 @@ export function createApprovedSession(input) {
 export function walletAuthExpressErrorHandler(error, _request, response, _next) {
     const walletError = toWalletAuthError(error);
     response.status(walletError.status).json({ error: walletError.message, code: walletError.code });
+}
+async function emitSecurityEvent(options, request, event) {
+    await options.onSecurityEvent?.({
+        ...event,
+        method: request.method,
+        path: request.originalUrl || request.url,
+        ip: request.ip,
+        userAgent: request.get("user-agent")
+    });
 }
 export * from "./memoryNonceStore.js";
 export * from "./errors.js";

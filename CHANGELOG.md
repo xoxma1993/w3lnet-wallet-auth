@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1
+
+- Added Express security event hooks for invalid nonce, invalid signature, invalid namespace, and honeypot route events.
+- Added optional defensive honeypot handling for unknown auth routes.
+- Added Express adapter tests for security events.
+
 ## 0.1.0
 
 - Initial public package structure.

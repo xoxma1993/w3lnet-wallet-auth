@@ -14,6 +14,16 @@ export type CreateWalletAuthRouterOptions = {
     proposal?: SessionProposal;
     nonceTtlMs?: number;
     sessionTtlMs?: number;
+    honeypot?: boolean;
+    onSecurityEvent?(event: WalletAuthSecurityEvent): Promise<void> | void;
+};
+export type WalletAuthSecurityEvent = {
+    type: "invalid_nonce" | "invalid_signature" | "invalid_namespaces" | "honeypot";
+    method: string;
+    path: string;
+    ip?: string;
+    userAgent?: string;
+    detail?: string;
 };
 export declare function createWalletAuthRouter(options: CreateWalletAuthRouterOptions): ExpressRouter;
 export declare function createApprovedSession(input: {

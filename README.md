@@ -101,6 +101,10 @@ app.use(
   createWalletAuthRouter({
     appName: "My App",
     nonceStore,
+    honeypot: true,
+    onSecurityEvent(event) {
+      console.warn("wallet-auth security event", event);
+    },
     async issueSession({ subject, request, issuedAt, expiresAt }) {
       const session = createApprovedSession({
         subject,
@@ -122,6 +126,8 @@ app.use(
 ```
 
 The adapter does not create users or persist sessions for you. The host app owns `issueSession` and should store the returned session as needed.
+
+The `honeypot` option is defensive-only. It emits security events for unknown auth routes and returns `404`; it does not attack, damage, or interact with clients beyond normal HTTP responses.
 
 ## Notes
 
